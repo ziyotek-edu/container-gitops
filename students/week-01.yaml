@@ -1,0 +1,23 @@
+---
+# Week 01 Student Container Submissions
+#
+# Each student adds their entry below after pushing their container to GHCR.
+# See README.md for submission instructions.
+
+apiVersion: container-course.ziyotek.edu/v1
+kind: StudentSubmissions
+metadata:
+  week: 1
+  semester: spring-2026
+  namespace: container-course-week01
+
+students:
+  # Example entry - remove this and add your own:
+  # - name: "John Doe"
+  #   github_username: "johndoe"
+  #   container_image: "ghcr.io/johndoe/container-course-student:latest"
+  #   student_endpoint: "/student"
+  #   health_endpoint: "/health"
+  #   port: 5000
+
+  # Add your submission below this line:

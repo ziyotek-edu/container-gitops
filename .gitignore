@@ -1,0 +1,21 @@
+# Generated manifests (commit these for GitOps)
+# manifests/generated/*.yaml
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets (just in case)
+*.key
+*.pem
+secrets/

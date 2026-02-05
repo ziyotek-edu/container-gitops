@@ -1,0 +1,106 @@
+name: Validate Student Submission
+
+on:
+  pull_request:
+    paths:
+      - 'students/week-*.yaml'
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate YAML and Container
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq jq curl
+
+      - name: Validate YAML syntax
+        run: |
+          echo "=== Validating YAML syntax ==="
+          for file in students/week-*.yaml; do
+            if [ -f "$file" ]; then
+              echo "Checking $file..."
+              yq eval '.' "$file" > /dev/null
+              echo "✅ $file is valid YAML"
+            fi
+          done
+
+      - name: Validate student submissions
+        run: |
+          chmod +x scripts/validate-student.sh
+          ./scripts/validate-student.sh students/week-01.yaml
+
+      - name: Check for duplicates
+        run: |
+          echo "=== Checking for duplicate usernames ==="
+          DUPLICATES=$(yq eval '.students[].github_username' students/week-01.yaml | sort | uniq -d)
+          if [ -n "$DUPLICATES" ]; then
+            echo "❌ Duplicate usernames found:"
+            echo "$DUPLICATES"
+            exit 1
+          fi
+          echo "✅ No duplicate usernames"
+
+      - name: Generate manifests (dry-run)
+        run: |
+          echo "=== Generating Kubernetes manifests (dry-run) ==="
+          chmod +x scripts/generate-manifests.sh
+          ./scripts/generate-manifests.sh students/week-01.yaml dry-run
+          echo "✅ Manifests generated successfully"
+
+      - name: Post PR comment with validation results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const studentFile = 'students/week-01.yaml';
+
+            // Read the YAML and extract new students
+            const { execSync } = require('child_process');
+            const students = execSync(`yq eval '.students[] | .github_username' ${studentFile}`).toString().trim().split('\n');
+
+            const comment = `## ✅ Validation Passed!
+
+            Your submission has been validated successfully.
+
+            **Submitted usernames:** ${students.filter(s => s).join(', ')}
+
+            Once this PR is merged, your container will be automatically deployed to:
+            \`https://container-course.ziyotek.edu/students/YOUR_USERNAME\`
+
+            View all deployments: https://container-course.ziyotek.edu/gallery
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for secrets in YAML
+        run: |
+          echo "=== Scanning for potential secrets ==="
+          if grep -rE '(password|secret|token|key|api_key)' students/; then
+            echo "❌ Potential secrets found in student submissions!"
+            echo "Please remove any sensitive data from your submission."
+            exit 1
+          fi
+          echo "✅ No secrets detected"
