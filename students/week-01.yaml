@@ -24,7 +24,7 @@ students:
   - name: "Test Student"
     github_username: "testuser"
     container_image: "nginx:alpine"
-    student_endpoint: "/"
+    student_endpoint: "/health"
     health_endpoint: "/"
     port: 80
   - name: "Jared Gore"
