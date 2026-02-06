@@ -27,7 +27,7 @@ students:
 
     - name: "zia ahmadi"
       github_username: "zahmadi57"
-      container_image: "docker pull ghcr.io/zahmadi57/container-course-student:v3-student"
+      container_image: "ghcr.io/zahmadi57/container-course-student:v3-student"
       student_endpoint: "/student"
       health_endpoint: "/health"
 
