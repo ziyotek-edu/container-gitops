@@ -25,6 +25,12 @@ students:
       student_endpoint: "/student"
       health_endpoint: "/health"
 
+      - name: "zia ahmadi"
+      github_username: "zahmadi57"
+      container_image: "docker pull ghcr.io/zahmadi57/container-course-student:v3-student"
+      student_endpoint: "/student"
+      health_endpoint: "/health"
+
   # Add your submission below this line:
 # Test trigger 1770313044
 # Final test 1770313541
