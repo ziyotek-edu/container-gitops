@@ -8,4 +8,6 @@ resources:
   - gallery-configmap.yaml
   - student-almsid-deployment.yaml
   - student-emmzi55-deployment.yaml
+  - student-jlgore-deployment.yaml
+  - student-omar-masood-deployment.yaml
   - student-otajon99-deployment.yaml

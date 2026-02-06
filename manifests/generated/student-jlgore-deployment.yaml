@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-jlgore
+  namespace: container-course-week01
+  labels:
+    app: student-app
+    student: jlgore
+    week: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-app
+      student: jlgore
+  template:
+    metadata:
+      labels:
+        app: student-app
+        student: jlgore
+    spec:
+      containers:
+      - name: student-app
+        image: ghcr.io/jlgore/container-course-student:latest
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: STUDENT_NAME
+          value: "Jared Gore"
+        - name: GITHUB_USERNAME
+          value: "jlgore"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-jlgore-svc
+  namespace: container-course-week01
+  labels:
+    student: jlgore
+spec:
+  selector:
+    app: student-app
+    student: jlgore
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http
